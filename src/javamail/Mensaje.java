@@ -1,13 +1,18 @@
 package javamail;
 
 import java.util.Properties;
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.swing.JOptionPane;
 
 public class Mensaje extends Screen {
@@ -18,6 +23,11 @@ public class Mensaje extends Screen {
     String To = "";
     String Subject = "";
 
+    public void setJTextFieldArchivo(String archivo)
+    {
+        jTextFieldArchivo.setText(archivo);
+    }
+    
     public void SendMail() {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -34,18 +44,43 @@ public class Mensaje extends Screen {
 
         try {
 
-            Message message = new MimeMessage(session);
+            MimeMultipart partes = this.obtenerPartes();
+            
+            MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(Username));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(To));
             message.setSubject(Subject);
-            message.setText(Mensage);
+            //message.setText(Mensage);
+            
+            message.setContent(partes);
 
             Transport.send(message);
 
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private MimeMultipart obtenerPartes() throws MessagingException
+    {
+        MimeMultipart partes = new MimeMultipart();
+        BodyPart texto = new MimeBodyPart();
+        
+        texto.setText(Mensage);
+        partes.addBodyPart(texto);
+        
+        if(!jTextFieldArchivo.getText().equals(""))
+        {
+            BodyPart adjunto = new MimeBodyPart();
+            String [] tokensRuta = jTextFieldArchivo.getText().split("/");
+            
+            adjunto.setDataHandler(new DataHandler(new FileDataSource(jTextFieldArchivo.getText())));
+            adjunto.setFileName(tokensRuta[tokensRuta.length - 1]);
+            partes.addBodyPart(adjunto);
+        }
+        
+        return partes;
     }
 
     public Mensaje() {
@@ -71,19 +106,21 @@ public class Mensaje extends Screen {
         jButtonLimpiar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextAreaTo = new javax.swing.JTextArea();
+        jButton1 = new javax.swing.JButton();
+        jTextFieldArchivo = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTextFieldSubject.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
-        jLabel2.setText("Para");
+        jLabel2.setText("Para:");
 
         jLabel3.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
-        jLabel3.setText("Asunto");
+        jLabel3.setText("Asunto:");
 
         jLabel4.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
-        jLabel4.setText("Mensaje");
+        jLabel4.setText("Mensaje:");
 
         jTextAreaMessage.setColumns(20);
         jTextAreaMessage.setFont(new java.awt.Font("Century Gothic", 0, 13)); // NOI18N
@@ -118,6 +155,16 @@ public class Mensaje extends Screen {
         jTextAreaTo.setRows(5);
         jScrollPane2.setViewportView(jTextAreaTo);
 
+        jButton1.setText("...");
+        jButton1.setFocusable(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jTextFieldArchivo.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,30 +182,42 @@ public class Mensaje extends Screen {
                                 .addComponent(jButtonCancelar)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButtonLimpiar)))
-                        .addGap(82, 82, 82))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextFieldSubject, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2)
+                            .addComponent(jScrollPane1)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jButton1)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(jTextFieldArchivo))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel2)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(jLabel3)
+                                            .addGap(18, 18, 18)
+                                            .addComponent(jTextFieldSubject, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGap(0, 0, Short.MAX_VALUE))))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jTextFieldArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(jTextFieldSubject, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -167,7 +226,7 @@ public class Mensaje extends Screen {
                     .addComponent(jButtonEnviar)
                     .addComponent(jButtonCancelar)
                     .addComponent(jButtonLimpiar))
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addGap(6, 6, 6))
         );
 
         pack();
@@ -199,6 +258,12 @@ public class Mensaje extends Screen {
         
         JOptionPane.showMessageDialog(this, "Su mensaje ha sido enviado");
     }//GEN-LAST:event_jButtonEnviarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        
+        Selector selector = new Selector(this);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -239,6 +304,7 @@ public class Mensaje extends Screen {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonCancelar;
     private javax.swing.JButton jButtonEnviar;
     private javax.swing.JButton jButtonLimpiar;
@@ -249,6 +315,7 @@ public class Mensaje extends Screen {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextAreaMessage;
     private javax.swing.JTextArea jTextAreaTo;
+    private javax.swing.JTextField jTextFieldArchivo;
     private javax.swing.JTextField jTextFieldSubject;
     // End of variables declaration//GEN-END:variables
 }
