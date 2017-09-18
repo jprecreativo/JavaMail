@@ -11,7 +11,7 @@ package javamail;
  */
 public class LogIn extends Screen {
 
-    EnviarMensaje ventana = new EnviarMensaje();
+    Mensaje ventana = new Mensaje();
 
     public LogIn() {
         initComponents();
