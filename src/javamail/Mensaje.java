@@ -73,9 +73,10 @@ public class Mensaje extends Screen {
         if(!jTextFieldArchivo.getText().equals(""))
         {
             BodyPart adjunto = new MimeBodyPart();
-            String [] tokensRuta = jTextFieldArchivo.getText().split("/");
+            String ruta = jTextFieldArchivo.getText().replaceAll("\\\\", "/");
+            String [] tokensRuta = ruta.split("/");
             
-            adjunto.setDataHandler(new DataHandler(new FileDataSource(jTextFieldArchivo.getText())));
+            adjunto.setDataHandler(new DataHandler(new FileDataSource(ruta)));
             adjunto.setFileName(tokensRuta[tokensRuta.length - 1]);
             partes.addBodyPart(adjunto);
         }
