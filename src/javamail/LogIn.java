@@ -110,8 +110,12 @@ public class LogIn extends Screen {
     }//GEN-LAST:event_jButtonCancelarActionPerformed
 
     private void jButtonAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAceptarActionPerformed
-        ventana.Username = jTextFieldEmail.getText();
-        ventana.PassWord = new String(jPasswordFieldPassword.getPassword());
+        String correo = jTextFieldEmail.getText();
+        
+        Mensaje.Username = correo;
+        Mensaje.PassWord = new String(jPasswordFieldPassword.getPassword());
+        Mensaje.Dominio = correo.substring(correo.indexOf('@') + 1, correo.indexOf('.'));
+        
         ventana.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButtonAceptarActionPerformed

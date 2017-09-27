@@ -2,6 +2,7 @@ package javamail;
 
 import java.util.Properties;
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -17,11 +18,13 @@ import javax.swing.JOptionPane;
 
 public class Mensaje extends Screen {
 
-    public static String Username = "";
-    public static String PassWord = "";
-    String Mensage = "";
-    String To = "";
-    String Subject = "";
+    public static String Username;
+    public static String PassWord;
+    public static String Dominio;
+    
+    private String Mensage = "";
+    private String To = "";
+    private String Subject = "";
 
     public void setJTextFieldArchivo(String archivo)
     {
@@ -32,7 +35,7 @@ public class Mensaje extends Screen {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.host", "smtp." + Mensaje.Dominio + ".com");
         props.put("mail.smtp.port", "587");
 
         Session session = Session.getInstance(props,
@@ -66,7 +69,7 @@ public class Mensaje extends Screen {
     {
         MimeMultipart partes = new MimeMultipart();
         BodyPart texto = new MimeBodyPart();
-        
+                
         texto.setText(Mensage);
         partes.addBodyPart(texto);
         
