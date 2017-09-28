@@ -2,7 +2,6 @@ package javamail;
 
 import java.util.Properties;
 import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -21,10 +20,11 @@ public class Mensaje extends Screen {
     public static String Username;
     public static String PassWord;
     public static String Dominio;
+    public static String Tld;
     
-    private String Mensage = "";
-    private String To = "";
-    private String Subject = "";
+    private String Mensage;
+    private String To;
+    private String Subject;
 
     public void setJTextFieldArchivo(String archivo)
     {
@@ -35,7 +35,7 @@ public class Mensaje extends Screen {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp." + Mensaje.Dominio + ".com");
+        props.put("mail.smtp.host", "smtp." + Mensaje.Dominio + "." + Tld);
         props.put("mail.smtp.port", "587");
 
         Session session = Session.getInstance(props,
@@ -91,7 +91,7 @@ public class Mensaje extends Screen {
         initComponents();
         super.inicialize(this.getWidth(), this.getHeight(), "Mensaje");
         
-        jTextAreaMessage.setLineWrap(true); //Se logra que haya salto de línea en el TextArea
+        // jTextAreaMessage.setLineWrap(true); //Se logra que haya salto de línea en el TextArea
         jTextAreaMessage.setWrapStyleWord(true); //Se impide la división de palabras en el TestArea
     }
 

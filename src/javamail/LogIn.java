@@ -115,6 +115,7 @@ public class LogIn extends Screen {
         Mensaje.Username = correo;
         Mensaje.PassWord = new String(jPasswordFieldPassword.getPassword());
         Mensaje.Dominio = correo.substring(correo.indexOf('@') + 1, correo.indexOf('.'));
+        Mensaje.Tld = correo.substring(correo.indexOf('.') + 1, correo.length());
         
         ventana.setVisible(true);
         this.dispose();
