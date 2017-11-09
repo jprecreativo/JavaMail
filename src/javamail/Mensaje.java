@@ -1,5 +1,7 @@
 package javamail;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -25,6 +27,7 @@ public class Mensaje extends Screen {
     private String Mensage;
     private String To;
     private String Subject;
+    private ArrayList<String> erroneousEmails;
 
     public void setJTextFieldArchivo(String archivo)
     {
@@ -61,7 +64,10 @@ public class Mensaje extends Screen {
             Transport.send(message);
 
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            
+            System.out.println("Error: " + e.getMessage());
+            
+            erroneousEmails.add(To);
         }
     }
     
@@ -93,6 +99,8 @@ public class Mensaje extends Screen {
         
         // jTextAreaMessage.setLineWrap(true); //Se logra que haya salto de línea en el TextArea
         jTextAreaMessage.setWrapStyleWord(true); //Se impide la división de palabras en el TestArea
+        
+        erroneousEmails = new ArrayList();
     }
 
     @SuppressWarnings("unchecked")
@@ -253,20 +261,36 @@ public class Mensaje extends Screen {
         Mensage = jTextAreaMessage.getText();
         Subject = jTextFieldSubject.getText();
         String [] emails = jTextAreaTo.getText().split("\n");
+        ArrayList<String> emailsList = new ArrayList(Arrays.asList(emails));
         
-        for (String email : emails) 
+        do
         {
-            To = email;
+            To = emailsList.remove(0);
+            
             SendMail();
-        } 
+        }
+        while(!emailsList.isEmpty());
         
-        JOptionPane.showMessageDialog(this, "Su mensaje ha sido enviado");
+        if(erroneousEmails.isEmpty())
+            JOptionPane.showMessageDialog(this, "Su mensaje ha sido enviado a todo los destinatarios.");
+        
+        else
+        {
+            String mensaje = "";
+            
+            while(!erroneousEmails.isEmpty())
+                mensaje += erroneousEmails.remove(0) + "\n";
+            
+            mensaje += "\nSu mensaje no se ha podido enviar a esos destinatarios.";
+            
+            JOptionPane.showMessageDialog(this, mensaje, "Correos inexistentes o erróneos", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jButtonEnviarActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         
-        Selector selector = new Selector(this);
+        new Selector(this);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
